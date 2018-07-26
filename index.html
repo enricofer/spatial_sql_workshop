@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=1024, user-scalable=no">
+  <meta name="author" content="Enrico Ferreguti - enricofer@gmail.com">
+  <meta name="venue" content="EstateGis 2018">
+  <meta name="date" content="26/7/2018">
 
-  <title>Your deck.js Presentation</title>
+  <title>Geoprocessing in SQL</title>
 
   <!-- Required stylesheet -->
   <link rel="stylesheet" media="screen" href="core/deck.core.css">
@@ -79,36 +81,24 @@
 
     <!-- Begin slides. Just make elements with a class of slide. -->
 
+    <section class="slide">
+      <h2>GEOPROCESSING IN SQL</h2>
+      <h2>https://enricofer.github.io/spatial_sql_workshop/</h2>
+      <h3>ESTATE GIS - MASTER IN GIS-SCIENCE E DRONI</h3>
+      <p><a href="https://creativecommons.org/licenses/by-sa/3.0/it/">(C)2018 CC-BY-SA</a> Enrico Ferreguti enricofer@gmail.com</p>
+    </section>
 
     <section class="slide">
-<h2>GEOPROCESSING IN SQL</h2>
-<h2>ESTATE GIS - MASTER IN GIS-SCIENCE E DRONI</h2>
+      <h2>Database relazionali</h2>
+      <p>Un database relazionale è fondamentalmente una raccolta di tabelle organizzata in modo da evitare la ridondanza dei dati e permettere di relazioni logiche tra i dati.</p>
 
-<p>Enrico Ferreguti enricofer@gmail.com<P>
+      <img src="https://www.okpedia.it/data/okpedia/database-relazionale-esempio.gif">
 
-<div class ='wrapper editor'>
-<textarea class="code" id='code' name='code'>
-SELECT AsGeoJSON(ST_Union(comuni.geom)) AS geojson
-FROM comuni, ferrovie
-WHERE  st_intersects (comuni.geom,ferrovie.geom)
-</textarea>
-<button class="hidden"></button>
-</div>
-</section>
-
-
-
-<section class="slide">
-  <h2>Database relazionali</h2>
-  <p>Un database relazionale è fondamentalmente una raccolta di tabelle organizzata in modo da evitare la ridondanza dei dati e permettere di relazioni logiche tra i dati.</p>
-
-  <img src="https://www.okpedia.it/data/okpedia/database-relazionale-esempio.gif">
-
-  <p>In un database convenzionale le varie tabelle sono collegate tra loro da chiavi (*keys*) che permettono di collegare *record* e *campi* delle varie tabelle</p>
-</section>
+      <p>In un database convenzionale le varie tabelle sono collegate tra loro da chiavi (*keys*) che permettono di collegare *record* e *campi* delle varie tabelle</p>
+    </section>
 
     <section class="slide">
-      <h2>SQL</h2>
+      <h2>SQL e database</h2>
       <p>Il sistema che gestisce il database relazionale si chiama RDBMS *Relational DataBase Management System* e può essere monoutente, orientato alla manipolazione personale di dati (Access, Sqlite) o multiutente, basato su server, con complessa gestione</p>
       <p>SQL  è un acronimo che significa *Structured Query Language* ed è un linguaggio ideato negli anni '70  per accedere ed amministrare database relazionali e pur declinato in molti dialetti è diventato uno standard</p>
     </section>
@@ -137,33 +127,37 @@ WHERE  st_intersects (comuni.geom,ferrovie.geom)
     </section>
 
     <section class="slide">
+      <h1>SQL</h1>
+    </section>
+
+    <section class="slide">
       <h2>SINTASSI SQL</h2>
       <p>In linguaggio SQL sono possibili parecchi tipi di Query:</p>
       <p>query di creazione tabella:</p>
       <div class ='wrapper editor'>
       <textarea class="code" id='code1' name='code'>
-      CREATE TABLE tab(id INT PRIMARY KEY NOT NULL, campo1 CHAR(50), campo2 INT);
+CREATE TABLE tab(id INT PRIMARY KEY NOT NULL, campo1 CHAR(50), campo2 INT);
       </textarea>
       <button class="hidden"></button>
       </div>
       <p>query di inserimento dati:</p>
       <div class ='wrapper editor'>
       <textarea class="code" id='code2' name='code'>
-      INSERT INTO tab (id, campo1, campo2) VALUES (1, 'valore 1', 120);
+INSERT INTO tab (id, campo1, campo2) VALUES (1, 'valore 1', 120);
       </textarea>
       <button class="hidden"></button>
       </div>
       <p>query di cancellazione tabella:</p>
       <div class ='wrapper editor'>
       <textarea class="code" id='code3' name='code'>
-      DROP TABLE tab;
+DROP TABLE tab;
       </textarea>
       <button class="hidden"></button>
       </div>
       <p>query di aggiornamento:</p>
       <div class ='wrapper editor'>
       <textarea class="code" id='code4' name='code'>
-      UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
+UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
       </textarea>
       <button class="hidden"></button>
       </div>
@@ -176,8 +170,7 @@ WHERE  st_intersects (comuni.geom,ferrovie.geom)
       <textarea class="code" id='code4' name='code'>
         SELECT id, campo1
         FROM tab
-        WHERE campo2 > 100;
-      </textarea>
+        WHERE campo2 > 100;</textarea>
       <button class="hidden"></button>
 
       <p><br/>I dialetti SQL sono molti e ci sono grandi differenze di dettaglio.
@@ -196,35 +189,27 @@ WHERE  st_intersects (comuni.geom,ferrovie.geom)
       <p>E' possibile una visualizzazione tabellare:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT * FROM comuni
-        </textarea>
+      SELECT * FROM comuni</textarea>
         <button></button>
       </div>
       <p>o una visualizzazione su mappa: Le tabelle contengono un campo *geom* con le informazioni spaziali memorizzate in latitudine e longitudine (ETRS89 epsg:4258) e visualizzabili
         producendo una geometria <a href="https://it.wikipedia.org/wiki/GeoJSON">geojson</a><br/></p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT AsGeoJSON(geom) AS geojson FROM comuni --geometria poligonale
-      UNION
-      SELECT AsGeoJSON(geom) AS geojson FROM strade --geometria lineare
-      UNION
-      SELECT AsGeoJSON(geom) AS geojson FROM fiumi --geometria lineare
-      UNION
-      SELECT AsGeoJSON(geom) AS geojson FROM centri --geometria puntuale
-        </textarea>
+      SELECT AsGeoJSON(geom) AS geojson
+      FROM comuni</textarea>
         <button></button>
       </div>
     </section>
 
 
     <section class="slide">
-      <h2>Funzioni SQlite di utilità generale</h2>
+      <h2>Altre unzioni di utilità generale</h2>
       <p>lista degli oggetti attualmente presenti nel database</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
           SELECT *
-          FROM sqlite_master
-        </textarea>
+          FROM sqlite_master</textarea>
         <button></button>
       </div>
       <p>Lista delle sole tabelle</p>
@@ -232,15 +217,13 @@ WHERE  st_intersects (comuni.geom,ferrovie.geom)
         <textarea class="code" id='code' name='code'>
       SELECT *
       FROM sqlite_master
-      WHERE type = 'table'
-        </textarea>
+      WHERE type = 'table'</textarea>
         <button></button>
       </div>
       <p>Descrizione di una tabella</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      pragma table_info(comuni)
-        </textarea>
+      pragma table_info(comuni)</textarea>
         <button></button>
       </div>
     </section>
@@ -250,40 +233,42 @@ WHERE  st_intersects (comuni.geom,ferrovie.geom)
       <p>Disponiamo delle seguenti tabelle, visualizzabili eseguendo le query:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT * FROM comuni</textarea>
+SELECT * FROM comuni</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT * FROM ferrovie</textarea>
+SELECT * FROM ferrovie</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT * FROM fiumi</textarea>
+SELECT * FROM fiumi</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT * FROM centri</textarea>
+SELECT * FROM centri</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT * FROM pop --tabella senza geometria</textarea>
+SELECT * FROM pop --tabella senza geometria</textarea>
         <button></button>
       </div>
+</section>
 
+    <section class="slide">
+      <h2>Campi, Subquery e Accodamenti</h2>
       <p>Alias:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT comune,provincia, istat AS codice
-FROM comuni
-        </textarea>
+FROM comuni</textarea>
         <button></button>
       </div>
       <p>Query nidificate:<br/></p>
@@ -292,8 +277,17 @@ FROM comuni
 SELECT subquery.comune
 FROM (
     SELECT * FROM comuni
-) AS subquery
-        </textarea>
+) AS subquery</textarea>
+        <button></button>
+      </div>
+      <p>Accodamenti:<br/></p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT istat as id,comune AS nome FROM comuni
+UNION
+SELECT OBJECTID as id, NAMN1 AS nome FROM strade
+UNION
+SELECT OBJECTID as id, NAMN1 AS nome FROM centri</textarea>
         <button></button>
       </div>
     </section>
@@ -303,39 +297,34 @@ FROM (
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT * FROM comuni
-WHERE provincia = 'PD'
-        </textarea>
+WHERE provincia = 'PD'</textarea>
         <button></button>
       </div>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT * FROM comuni
-WHERE istat BETWEEN 28021 AND 28044
-        </textarea>
-        <button></button>
-      </div>
-
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-SELECT * FROM comuni
-WHERE comune in ('Padova','Venezia','Treviso')
-        </textarea>
+WHERE istat BETWEEN 28021 AND 28044</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT * FROM comuni
-WHERE comune LIKE 'Ve%'
-        </textarea>
+WHERE comune in ('Padova','Venezia','Treviso')</textarea>
+        <button></button>
+      </div>
+
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT * FROM comuni
+WHERE comune LIKE 'Ve%'</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT * FROM centri
-WHERE NAMN1 = (SELECT comune FROM comuni WHERE istat = 28021)
-        </textarea>
+WHERE NAMN1 = (SELECT comune FROM comuni WHERE istat = 28021)</textarea>
         <button></button>
       </div>
 
@@ -350,8 +339,7 @@ WHERE NAMN1 = (SELECT comune FROM comuni WHERE istat = 28021)
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT comune, pop_totale, famiglie + convivenze as nuclei, cast(pop_totale AS float)/(famiglie + convivenze) as componenti_medi
-FROM pop
-        </textarea>
+FROM pop</textarea>
         <button></button>
       </div>
       <p>ordinamento crescente</p>
@@ -359,8 +347,7 @@ FROM pop
         <textarea class="code" id='code' name='code'>
 SELECT *
 FROM pop
-ORDER BY famiglie
-        </textarea>
+ORDER BY famiglie</textarea>
         <button></button>
       </div>
       <p>ordinamento decrescente</p>
@@ -377,8 +364,7 @@ ORDER BY pop_totale DESC
         <textarea class="code" id='code' name='code'>
 SELECT *
 FROM comuni
-ORDER BY provincia,comune
-        </textarea>
+ORDER BY provincia,comune</textarea>
         <button></button>
       </div>
     </section>
@@ -403,8 +389,7 @@ SELECT
   comuni.comune, pop.pop_totale,
   pop.pop_totale/comuni.area_ha AS densita
 FROM comuni JOIN pop ON comuni.istat=pop.cod
-ORDER BY densita DESC
-        </textarea>
+ORDER BY densita DESC</textarea>
         <button></button>
       </div>
       <p>il LEFT JOIN associa a tutte le righe di una tabella le righe di un'altra solo se soddisfano una condizione, altrimenti NULL</p>
@@ -432,8 +417,7 @@ SELECT
   SUM(area_ha) as area_ha,
   AVG(area_ha) as area_media
 FROM comuni
-GROUP BY provincia
-        </textarea>
+GROUP BY provincia</textarea>
         <button></button>
       </div>
       <div class ='wrapper editor'>
@@ -461,8 +445,7 @@ SELECT
   AVG(area_ha) as area_media
 FROM comuni
 GROUP BY provincia
-HAVING area_prov > 300000
-        </textarea>
+HAVING area_prov > 300000</textarea>
         <button></button>
       </div>
       <p>La seguente query prima filtra i record e poi li raggruppa</p>
@@ -475,11 +458,37 @@ SELECT
   AVG(area_ha) as area_media
 FROM comuni
 WHERE area_ha > 5000
-GROUP BY provincia
-        </textarea>
+GROUP BY provincia</textarea>
         <button></button>
       </div>
 
+    </section>
+
+    <section class="slide">
+      <h2>Altri oggetti di un Database</h2>
+      <p>Oltre alle tabelle un database relazionale dispone di numerosi altri oggetti, il cui utilizzo va oltre lo scopo del workshop, ma che è opportuno conoscere</p>
+      <ul>
+        <li>VIEW: una vista permette di memorizzare una query di selezione assegnandole un nome. La view può essere richiamata secondo necessità e trattata come una tabella (in sola lettura)</li>
+        <li>SEQUENCE: una sequenza permette di popolare un campo con valori progressivi ad ogni chiamata. tipicamente vengono usate per i campi autonumeranti </li>
+        <li>INDEX: gli indici permettono di organizzare i dati in modo da facilitarne il reperimento durante la ricerca. La configurazione opportuna e l'aggiornamento degli indici è fondamentale per il miglioramento delle prestazioni di un DataBase </li>
+        <li>TRIGGERS: sono delle query, tipicamente di aggiornamento o di creazione di tabelle scatenate dall'accadere di qualche evento programmato in anticipo </li>
+        <li>STORED_PROCEDURES: sono funzioni programmabili dall'utente e richiamabili all'interno delle query</li>
+      </ul>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+CREATE VIEW province AS
+  SELECT provincia, COUNT(comuni.comune) as num_comuni, SUM(pop.pop_totale) as pop
+  FROM comuni JOIN pop ON comuni.istat = pop.cod
+  GROUP BY provincia;
+
+SELECT * from province
+ORDER BY num_comuni;</textarea>
+        <button></button>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h1>SPATIALITE</h1>
     </section>
 
     <section class="slide">
@@ -511,8 +520,7 @@ SELECT
 	geom,
   ST_AsText(geom) AS wkt,
   Hex(ST_AsBinary(geom)) AS wkb
-FROM centri
-        </textarea>
+FROM centri</textarea>
         <button></button>
       </div>
     </section>
@@ -542,47 +550,199 @@ SELECT
         <textarea class="code" id='code' name='code'>
 SELECT AsGeoJSON(geom) as geojson
 FROM comuni
-WHERE ST_Intersects(geom,ST_GeomFromText('POLYGON((11 45,11 46,12 46,12 45, 11 45))'))
-        </textarea>
+WHERE ST_Intersects(geom,ST_GeomFromText('POLYGON((11 45,11 46,12 46,12 45, 11 45))'))</textarea>
         <button></button>
       </div>
     </section>
 
     <section class="slide">
-      <h2></h2>
-      <p></p>
-      <img src="">
-      <p></p>
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
+      <h2>Spatial JOIN</h2>
+      <p>L'unione di due tabelle è possibile quando una condizione di JOIN è soddisfatta. Se la condizione è basata su una relazione spaziale tra geometrie, si stabilisce un Join spaziale tra dati</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT comuni.provincia, centri.*
+FROM centri JOIN comuni ON ST_Within(centri.geom, comuni.geom)</textarea>
+        <button></button>
+      </div>
+      <p>Dall'unione delle tabelle potrebbe risultare dei risultati non univoci:</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT fiumi.NAMN1, comuni.*
+FROM comuni JOIN fiumi ON ST_Intersects(fiumi.geom, comuni.geom)</textarea>
+        <button></button>
+      </div>
+      <p>Sarà quindi opportuno raggruppare i risultati</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT fiumi.NAMN1, comuni.*
+FROM comuni JOIN fiumi ON ST_Intersects(fiumi.geom, comuni.geom)
+GROUP BY comuni.comune</textarea>
+        <button></button>
+      </div>
+      <p>E' da notare come in altri DBMS la calusola GROUP BY pretende che tutti i campi siano esplicitamente aggregati. SQlite implicitamente mette il primo risultato</p>
     </section>
 
     <section class="slide">
-      <h2></h2>
-      <p></p>
-      <img src="">
-      <p></p>
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
+      <h2>AGGREGAZIONE SPAZIALE (dissolve)</h2>
+      <p>Le funzioni spaziali possono essere usate per collezionare le geometrie aggregate da una query di raggruppamento</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT
+	provincia,
+  COUNT(comune) as num_comuni,
+  SUM(area_ha) as area_ha,
+  AVG(area_ha) as area_media,
+  AsGeoJSON(ST_union(geom)) as geojson
+FROM comuni
+GROUP BY provincia</textarea>
+        <button></button>
+      </div>
+      <p>L'intersezione tra geometrie lineari genera geometrie puntuali:</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT
+  asgeojson(st_intersection(fiumi.geom,ferrovie.geom)) as geojson,
+  fiumi.NAMN1,
+  ferrovie.NAMN1
+FROM fiumi, ferrovie
+WHERE st_intersects(fiumi.geom,ferrovie.geom)</textarea>
+        <button></button>
+      </div>
     </section>
 
     <section class="slide">
-      <h2></h2>
-      <p></p>
-      <img src="">
-      <p></p>
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
+      <h2>MISURE e TRASFORMAZIONI</h2>
+      <p>E' possibile acquisire dati dimensionali delle geometrie inserite lunghezze, aree, distanze</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT comune,St_area(geom) AS superficie, St_length(geom) AS perimetro FROM comuni</textarea>
+        <button></button>
+      </div>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT NAMN1,St_length(geom) AS lunghezza FROM fiumi</textarea>
+        <button></button>
+      </div>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT NAMN1,St_distance(geom,ST_GeomFromText('POINT(11.89 45.4)')) AS dist_pd FROM centri</textarea>
+        <button></button>
+      </div>
+      <p>Essendo le geometrie espresse in latitudine e longitudine, I dati geometrici sono espressi in gradi. E' quindi necessario trasformare le coordinate in un sistema di riferimento proiettato per ottenere le corrette dimensioni in metri</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT NAMN1,St_length(st_transform(geom,3003)) AS lunghezza FROM fiumi</textarea>
+        <button></button>
+      </div>
     </section>
+
+    <section class="slide">
+      <h2>BUFFER</h2>
+      <p>La funzione di buffer genera un poligono i cui vertici distano ad una distanza costante da una geometria generatrice</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT
+  asgeojson(st_buffer(fiumi.geom,ferrovie.geom)) as geojson,
+  fiumi.NAMN1,
+  ferrovie.NAMN1
+FROM fiumi
+        </textarea>
+        <button></button>
+      </div>
+      <p>GeoArt</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT asgeojson(st_difference(centri_ferrovie.geom,fiumi_b.geom)) AS geojson
+FROM
+  (SELECT st_union(centri_b.geom,ferrovie_b.geom) AS geom
+  FROM
+    (SELECT st_union(st_buffer(geom,0.01)) AS geom
+    FROM centri) AS centri_b,
+    (SELECT st_union(st_buffer(geom,0.02)) AS geom
+    FROM ferrovie) AS ferrovie_b) AS centri_ferrovie,
+  (SELECT st_union(st_buffer(geom,0.02)) AS geom
+    FROM fiumi) AS fiumi_b</textarea>
+        <button></button>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>ALTRE ELABORAZIONI</h2>
+      <p>Query per il calcolo della distanza più breve tra centri e fiumi. </p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+          SELECT AsGeoJson(geom) AS geojson
+          FROM
+              (SELECT
+                  ST_distance(centri.geom,fiumi.geom) AS dist,
+                  St_ShortestLine(centri.geom,fiumi.geom) AS geom,
+                  centri.NAMN1,
+                  fiumi.NAMN1
+              FROM centri,
+                (SELECT ST_union(geom) AS geom, NAMN1
+                FROM fiumi
+                GROUP BY NAMN1) as fiumi
+
+              GROUP BY centri.NAMN1
+              HAVING MIN(dist)) AS centri_fiumi
+
+          UNION
+
+          SELECT AsGeoJson(geom) AS geojson
+          FROM centri
+
+          UNION
+
+          SELECT AsGeoJson(geom) AS geojson
+          FROM fiumi</textarea>
+        <button></button>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>ALTRE ELABORAZIONI</h2>
+      <p>analisi dell'eccentricità territoriale</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+          SELECT AsGeoJson(st_collect(st_collect(st_collect(geom_a,geom_l),geom_p),geom_o)) AS geojson
+          FROM
+          	(SELECT geom_a,geom_l,geom_p, geom_o, area_com, area_com/st_area(geom_a) as eccentricita
+               FROM
+                (SELECT 	ST_buffer(st_centroid(geom),ST_length(st_shortestline(geom,st_centroid(geom)))) AS geom_a,
+                 	  st_shortestline(geom,st_centroid(geom)) as geom_l,
+                 	  ST_ExteriorRing(ST_ConvexHull(geom)) as geom_p,
+                 	  st_difference(ST_ConvexHull(geom),geom) as geom_o,
+                    st_area(geom) as area_com
+                FROM comuni) as comuni_dist) as comuni_ecc</textarea>
+        <button></button>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h1>QGIS</h1>
+    </section>
+
+    <section class="slide">
+      <h2>Spatialite in QGIS</h2>
+      <p>E' possibile replicare in ambiente QGIS le esercitazioni del workshop. In tal caso è necessario:  </p>
+      <ul>
+        <li>Scaricare in locale il database dell'esercitazione: <a href="https://github.com/enricofer/spatiasql.js/blob/gh-pages/data/veneto.sqlite?raw=true">veneto.sqlite</a></li>
+        <li>Stabilire una connessione con il database </li>
+        <li>Aprire DB MANAGER</li>
+        <li>Incollare le query nella finestra SQL ed aggiungerle in mappa</li>
+      </ul>
+      <img src="img/QGIS_spatialite.png"/>
+    </section>
+
+    <section class="slide">
+      <h2>Virtual layers in QGIS</h2>
+      <p>Un'altro modo per usare in modo produttivo le query geospaziali in QGIS sono i <a href="https://docs.qgis.org/2.14/it/docs/user_manual/working_with_vector/virtual_layers.html">Virtual Layers:</a></p>
+      <p>I virtual Layers sono una caratteristica poco nota ma molto potente di QGIS, e permettono di creare relazioni SQL tra i layer correntemente caricati da qualunque datasource. Il virtual layer viene rigenerato in modo automatico e trasparente ogni qualvolta vengono aggiornati i layers collegati al layer virtuale: </p>
+      <p>La funzionalità è resa possibile replicando i layers in un database Spatialite locale gestito direttamente da QGIS, dunque la sintassi da utilizzare nelle query è quella di Spatialite. Su questa funzionalità è disponibile un breve ma chiaro <a href="https://pigrecoinfinito.wordpress.com/2016/04/06/qgis-virtual-layer/">tutorial di Totò Fiandaca</a></p>
+
+      <img src="img/QGIS_virtual_layers.png"/>
+    </section>
+
     <!-- End slides. -->
 
     <!-- Begin extension snippets. Add or remove as needed. -->
@@ -593,13 +753,6 @@ WHERE ST_Intersects(geom,ST_GeomFromText('POLYGON((11 45,11 46,12 46,12 45, 11 4
       <a href="#" class="deck-next-link" title="Next">&#8594;</a>
     </div>
 
-    <!-- deck.status snippet -->
-    <p class="deck-status" aria-role="status">
-      <span class="deck-status-current"></span>
-      /
-      <span class="deck-status-total"></span>
-    </p>
-
     <!-- deck.goto snippet -->
     <form action="." method="get" class="goto-form">
       <label for="goto-slide">Go to slide:</label>
@@ -607,6 +760,10 @@ WHERE ST_Intersects(geom,ST_GeomFromText('POLYGON((11 45,11 46,12 46,12 45, 11 4
       <datalist id="goto-datalist"></datalist>
       <input type="submit" value="Go">
     </form>
+
+    <p class="deck-status deck-progress-10">
+        <span class="deck-status-current"></span> / <span class="deck-status-total"></span> − <span class="var-venue">Estate GIS 2018</span> − <span class="var-title">Geoprocessing in SQL</span>
+    </p>
 
     <!-- End extension snippets. -->
   </div>
@@ -628,6 +785,9 @@ WHERE ST_Intersects(geom,ST_GeomFromText('POLYGON((11 45,11 46,12 46,12 45, 11 4
 
 <!-- Initialize the deck. You can put this in an external file if desired. -->
 <script>
+
+
+
   $(function() {
     $.deck('.slide');
   });
