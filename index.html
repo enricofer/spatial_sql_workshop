@@ -372,14 +372,12 @@ ORDER BY provincia,comune</textarea>
     <section class="slide">
       <h2>JOIN - relazioni tra tabelle</h2>
       <p>La funzione fondamentale dei database relazionali è consentire l'aggregazione di dati tra due tabelle:
-      <a href="https://it.wikipedia.org/wiki/Join_(SQL)">stabilendo una relazione tra campi</a></p>
-      <p>Il tipo più semplice di join è il CROSS JOIN (senza condizioni):</p>
+      <a href="https://it.wikipedia.org/wiki/Join_(SQL)">stabilendo una relazione tra campi</a>. Il tipo più semplice di join è il CROSS JOIN (senza condizioni):</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT comuni.comune, pop.comune
 FROM comuni,pop
-WHERE comuni.istat = 28028
-        </textarea>
+WHERE comuni.istat = 28028</textarea>
         <button></button>
       </div>
       <p>L'INNER JOIN associa le righe delle tabelle che soddisfano una condizione, tralasciando le altre</p>
@@ -407,7 +405,7 @@ WHERE centri.NAMN1 LIKE 'Pe%'
     </section>
 
     <section class="slide">
-      <h2>Query di aggregazione e raggruppamento</h2>
+      <h2>Aggregazione e raggruppamento</h2>
       <p>Un'altra caratteristica delle query SELECT è la capacità di creare delle tabelle di sintesi da altre più complesse</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -426,8 +424,7 @@ SELECT
 	provincia,
   COUNT(comuni.comune) as num_comuni, SUM(pop.pop_totale) as pop
 FROM comuni JOIN pop ON comuni.istat = pop.cod
-GROUP BY provincia
-        </textarea>
+GROUP BY provincia</textarea>
         <button></button>
       </div>
       <a href="https://www.sqlite.org/lang_aggfunc.html">Funzione di aggregazione disponibili in SQlite</a>
@@ -444,21 +441,9 @@ SELECT
   SUM(area_ha) as area_prov,
   AVG(area_ha) as area_media
 FROM comuni
+WHERE area_ha > 0 -- prima viene eseguito il WHERE
 GROUP BY provincia
-HAVING area_prov > 300000</textarea>
-        <button></button>
-      </div>
-      <p>La seguente query prima filtra i record e poi li raggruppa</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-SELECT
-	provincia,
-  COUNT(comune) as num_comuni,
-  SUM(area_ha) as area_ha,
-  AVG(area_ha) as area_media
-FROM comuni
-WHERE area_ha > 5000
-GROUP BY provincia</textarea>
+HAVING area_prov > 300000 -- poi viene eseguito HAVING</textarea>
         <button></button>
       </div>
 
@@ -466,22 +451,19 @@ GROUP BY provincia</textarea>
 
     <section class="slide">
       <h2>Altri oggetti di un Database</h2>
-      <p>Oltre alle tabelle un database relazionale dispone di numerosi altri oggetti, il cui utilizzo va oltre lo scopo del workshop, ma che è opportuno conoscere</p>
       <ul>
         <li>VIEW: una vista permette di memorizzare una query di selezione assegnandole un nome. La view può essere richiamata secondo necessità e trattata come una tabella (in sola lettura)</li>
         <li>SEQUENCE: una sequenza permette di popolare un campo con valori progressivi ad ogni chiamata. tipicamente vengono usate per i campi autonumeranti </li>
         <li>INDEX: gli indici permettono di organizzare i dati in modo da facilitarne il reperimento durante la ricerca. La configurazione opportuna e l'aggiornamento degli indici è fondamentale per il miglioramento delle prestazioni di un DataBase </li>
         <li>TRIGGERS: sono delle query, tipicamente di aggiornamento o di creazione di tabelle scatenate dall'accadere di qualche evento programmato in anticipo </li>
-        <li>STORED_PROCEDURES: sono funzioni programmabili dall'utente e richiamabili all'interno delle query</li>
       </ul>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-CREATE VIEW province AS
+CREATE VIEW prov AS
   SELECT provincia, COUNT(comuni.comune) as num_comuni, SUM(pop.pop_totale) as pop
   FROM comuni JOIN pop ON comuni.istat = pop.cod
   GROUP BY provincia;
-
-SELECT * from province
+SELECT * from prov
 ORDER BY num_comuni;</textarea>
         <button></button>
       </div>
@@ -512,7 +494,7 @@ ORDER BY num_comuni;</textarea>
         <li>geometria lineare</li>
         <li>geometria poligonale</li>
       </ul>
-      <p>a loro volta possono essere semplici o multipli e raccoglibili in collezioni: <a href="https://www.gaia-gis.it/gaia-sins/spatialite-cookbook/html/wkt-wkb.html">riferimento</a></p>
+      <p>che possono essere semplici o multiple e raccoglibili in collezioni: <a href="https://www.gaia-gis.it/gaia-sins/spatialite-cookbook/html/wkt-wkb.html">RIF</a></p>
       <p>L'informazione spaziale è contenuta in almeno un campo geometrico. Nelle tabelle del workshop il campo geografico è per convenzione il campo "geom", ma nulla vieta che possa avere un altro nome.<br/>Il formato di memorizzazione è binario, e quindi non visualizzabile "per gli umani" ma disponiamo di funzioni che permettono di trasformarlo in un formato più amichevole:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -523,6 +505,11 @@ SELECT
 FROM centri</textarea>
         <button></button>
       </div>
+    </section>
+
+    <section class="slide">
+      <h2>Tipi geometrici</h2>
+      <img src="http://vos.openlinksw.com/owiki/wiki/VOS/VirtGeoSPARQLEnhancementDocs/VirtWktGeomerticObjects.png"/>
     </section>
 
     <section class="slide">
@@ -542,9 +529,9 @@ SELECT
     </section>
 
     <section class="slide">
-      <h2>condizioni topologiche</h2>
+      <h2>Condizioni topologiche</h2>
       <p></p>
-      <img src="https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=2ahUKEwih75zGjLrcAhUqzYUKHRPXCU4QjRx6BAgBEAU&url=https%3A%2F%2Fwww.gaia-gis.it%2Fspatialite-2.1%2FSpatiaLite-manual.html&psig=AOvVaw26NHPw-WeNgoDC5jLS0gaL&ust=1532602764157333">
+      <img src="https://www.gaia-gis.it/spatialite-2.1/resource/mbrs.gif">
       <p></p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -583,7 +570,7 @@ GROUP BY comuni.comune</textarea>
     </section>
 
     <section class="slide">
-      <h2>AGGREGAZIONE SPAZIALE (dissolve)</h2>
+      <h2>AGGREGAZIONE SPAZIALE</h2>
       <p>Le funzioni spaziali possono essere usate per collezionare le geometrie aggregate da una query di raggruppamento</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -682,17 +669,12 @@ FROM
                 (SELECT ST_union(geom) AS geom, NAMN1
                 FROM fiumi
                 GROUP BY NAMN1) as fiumi
-
               GROUP BY centri.NAMN1
               HAVING MIN(dist)) AS centri_fiumi
-
           UNION
-
           SELECT AsGeoJson(geom) AS geojson
           FROM centri
-
           UNION
-
           SELECT AsGeoJson(geom) AS geojson
           FROM fiumi</textarea>
         <button></button>
