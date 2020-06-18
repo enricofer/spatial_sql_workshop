@@ -4,8 +4,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=1024, user-scalable=no">
   <meta name="author" content="Enrico Ferreguti - enricofer@gmail.com">
-  <meta name="venue" content="EstateGis 2018">
-  <meta name="date" content="26/7/2018">
+  <meta name="venue" content="Incontri estivi GFOSS">
+  <meta name="date" content="20/6/2020">
 
   <title>Geoprocessing in SQL</title>
 
@@ -82,52 +82,14 @@
     <!-- Begin slides. Just make elements with a class of slide. -->
 
     <section class="slide">
-      <h2>GEOPROCESSING IN SQL</h2>
+      <h2>INTRODUZIONE AI DATABASE GEOSPAZIALI</h2>
       <h2>https://enricofer.github.io/spatial_sql_workshop/</h2>
-      <h3>ESTATE GIS - MASTER IN GIS-SCIENCE E DRONI</h3>
-      <p><a href="https://creativecommons.org/licenses/by-sa/3.0/it/">(C)2018 CC-BY-SA</a> Enrico Ferreguti enricofer@gmail.com</p>
+      <h3>INCONTRI ESTIVI GFOSS</h3>
+      <p><a href="https://creativecommons.org/licenses/by-sa/3.0/it/">(C)2020 CC-BY-SA</a> Enrico Ferreguti enricofer@gmail.com</p>
     </section>
 
     <section class="slide">
-      <h2>Database relazionali</h2>
-      <p>Un database relazionale è fondamentalmente una raccolta di tabelle organizzata in modo da evitare la ridondanza dei dati e permettere di relazioni logiche tra i dati.</p>
-
-      <img src="https://www.okpedia.it/data/okpedia/database-relazionale-esempio.gif">
-
-      <p>In un database convenzionale le varie tabelle sono collegate tra loro da chiavi (*keys*) che permettono di collegare *record* e *campi* delle varie tabelle</p>
-    </section>
-
-    <section class="slide">
-      <h2>SQL e database</h2>
-      <p>Il sistema che gestisce il database relazionale si chiama RDBMS *Relational DataBase Management System* e può essere monoutente, orientato alla manipolazione personale di dati (Access, Sqlite) o multiutente, basato su server, con complessa gestione</p>
-      <p>SQL  è un acronimo che significa *Structured Query Language* ed è un linguaggio ideato negli anni '70  per accedere ed amministrare database relazionali e pur declinato in molti dialetti è diventato uno standard</p>
-    </section>
-
-    <section class="slide">
-      <h2>SPATIAL DATABASE</h2>
-      <p>Un database spaziale è un database convenzionale a cui sono associate le informazioni spaziale in un campo che per definizione chiamiamo *geometria*.</p>
-      <p>A tutt'oggi i più diffusi DBMS, sia  dispongono di estensioni per la manipolazione spaziale dei dati che permettono di:</p>
-      <ul>
-        <li>localizzare geograficamente il dato</li>
-        <li>mettere in relazione spaziale i dati</li>
-        <li>misurare il dato nella sua estensione spaziale</li>
-      </ul>
-    </section>
-
-    <section class="slide">
-      <h2>GIS vs SPATIAL DATABASE</h2>
-      <p>Adoperando un sistema GIS stiamo di fatto usando un database spaziale, Perchè dunque usare un database al posto del GIS per manipolare dati spaziali:</p>
-      <ul>
-        <li>Consente la gestione più agevole di grandi quantità di dati (Big data)</li>
-        <li>Consente una maggiore velocità di elaborazione (è tralasciata l'interfaccia grafica)</li>
-        <li>Consente una più agevole relazione tra i dati</li>
-        <li>Si evita di replicare i dati (scrivendo query si evita di esportare tabelle non necessarie)</li>
-        <li>I dati sono più facili da riusare (webgis)</li>
-      </ul>
-    </section>
-
-    <section class="slide">
-      <h1>SQL</h1>
+      <h1>Esercitazione guidata</h1>
     </section>
 
     <section class="slide">
@@ -168,11 +130,18 @@ UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
       <p>ma quello che ci interessa oggi è la query di ricerca</p>
       <div class ='wrapper editor'>
       <textarea class="code" id='code4' name='code'>
-        SELECT id, campo1
-        FROM tab
-        WHERE campo2 > 100;</textarea>
+        SELECT id, campo1   -- prendi id e campo1
+        FROM tabella        -- da tabella
+        WHERE campo2 > 100; -- dalle righe che soddisfano una condizione</textarea>
       <button class="hidden"></button>
+      </div>
 
+      <div class ='wrapper editor'>
+      <textarea class="code" id='code4' name='code'>
+        SELECT * 
+        FROM tabella -- elenca tutti i campi e tutte le righe di una tabella</textarea>
+      <button class="hidden"></button>
+      </div>
       <p><br/>I dialetti SQL sono molti e ci sono grandi differenze di dettaglio.
         Ma la struttura della sintassi principale per l'estrazione dei dati
          rimane praticamente la stessa per tutti i RDBMS.<br/>
@@ -193,39 +162,15 @@ UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
         <button></button>
       </div>
       <p>o una visualizzazione su mappa: Le tabelle contengono un campo *geom* con le informazioni spaziali memorizzate in latitudine e longitudine (ETRS89 epsg:4258) e visualizzabili
-        producendo una geometria <a href="https://it.wikipedia.org/wiki/GeoJSON">geojson</a><br/></p>
+        producendo una geometria <a href="https://it.wikipedia.org/wiki/GeoJSON">geojson</a> per mezzo della funzione AsGeoJSON()<br/></p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-      SELECT AsGeoJSON(geom) AS geojson
+      SELECT *, AsGeoJSON(geom) AS geojson
       FROM comuni</textarea>
         <button></button>
       </div>
-    </section>
-
-
-    <section class="slide">
-      <h2>Altre unzioni di utilità generale</h2>
-      <p>lista degli oggetti attualmente presenti nel database</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-          SELECT *
-          FROM sqlite_master</textarea>
-        <button></button>
-      </div>
-      <p>Lista delle sole tabelle</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-      SELECT *
-      FROM sqlite_master
-      WHERE type = 'table'</textarea>
-        <button></button>
-      </div>
-      <p>Descrizione di una tabella</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-      pragma table_info(comuni)</textarea>
-        <button></button>
-      </div>
+      <p>Il formato <a href="https://it.wikipedia.org/wiki/GeoJSON">geojson</a> è un formato testuale facilmente interpretabile da javascript come un'oggetto (dati serializzati) contentente dati geografici e relativi attributi.
+      Il formato è uno standard codificato di internet e costituisce una specie di lingua universale per l'interscambio di dati geografici nel web</p>
     </section>
 
     <section class="slide">
@@ -233,33 +178,47 @@ UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
       <p>Disponiamo delle seguenti tabelle, visualizzabili eseguendo le query:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT * FROM comuni</textarea>
+SELECT * FROM comuni     -- Confini comunali del Veneto (geometrie poligonali)</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT * FROM ferrovie</textarea>
+SELECT * FROM strade     -- Rete stradale (geometrie lineari)</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT * FROM fiumi</textarea>
+SELECT * FROM ferrovie   -- Rete ferroviaria (geometrie lineari)</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT * FROM centri</textarea>
+SELECT * FROM fiumi      -- Idrografia (geometrie lineari)</textarea>
         <button></button>
       </div>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT * FROM pop --tabella senza geometria</textarea>
+SELECT * FROM bacini     -- Bacini idrografici (geometrie poligonali)</textarea>
         <button></button>
       </div>
+
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT * FROM centri     -- Centri abitati (geometrie puntuali)</textarea>
+        <button></button>
+      </div>
+
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT * FROM pop        -- Popolazione italiana per comune (senza geometria)</textarea>
+        <button></button>
+      </div>
+
+      <p>L'elenco delle tabelle e dei relativi campi disponibili può essere visualizzato in ogni momento premendo il bottone "elenco tabelle"</p>
 </section>
 
     <section class="slide">
@@ -321,24 +280,24 @@ WHERE comune LIKE 'Ve%'</textarea>
         <button></button>
       </div>
 
+        <p>le condizioni in WHERE possono essere assemblate con AND, OR e negate con NOT
+        <a href="https://www.techonthenet.com/sqlite/and_or.php">attenzione alla precedenza degli operatori</a></p>
+
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT * FROM centri
 WHERE NAMN1 = (SELECT comune FROM comuni WHERE istat = 28021)</textarea>
         <button></button>
       </div>
-
-        <p>le condizioni in WHERE possono essere assemblate con AND, OR e negate con NOT
-        <a href="https://www.techonthenet.com/sqlite/and_or.php">attenzione alla precedenza degli operatori</a></p>
+      <p>le query nidificate possono essere utilizzate per ottenere un valore interrogando un'altra tabella</p>
       </section>
 
     <section class="slide">
       <h2>CAMPI CALCOLATI E ORDINAMENTO</h2>
-      <p>calcolo ed imposizione del tipo (CAST):
-      <a href="https://www.sqlite.org/lang_corefunc.html">Funzioni di manipolazione dei campi disponibili in SQlite</a></p>
+      <p>campi calcolati ed alias</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT comune, pop_totale, famiglie + convivenze as nuclei, cast(pop_totale AS float)/(famiglie + convivenze) as componenti_medi
+SELECT comune, pop_totale, famiglie + convivenze as nuclei, pop_totale/(famiglie + convivenze) as componenti_medi
 FROM pop</textarea>
         <button></button>
       </div>
@@ -438,12 +397,12 @@ GROUP BY provincia</textarea>
 SELECT
 	provincia,
   COUNT(comune) as num_comuni,
-  SUM(area_ha) as area_prov,
+  SUM(area_ha) as area_tot,
   AVG(area_ha) as area_media
 FROM comuni
-WHERE area_ha > 0 -- prima viene eseguito il WHERE
+WHERE area_ha > 5000 -- prima viene eseguito il WHERE
 GROUP BY provincia
-HAVING area_prov > 300000 -- poi viene eseguito HAVING</textarea>
+HAVING area_tot > 100000 -- poi viene eseguito HAVING</textarea>
         <button></button>
       </div>
 
@@ -470,7 +429,7 @@ ORDER BY num_comuni;</textarea>
     </section>
 
     <section class="slide">
-      <h1>SPATIALITE</h1>
+      <h1>FUNZIONI GEOSPAZIALI</h1>
     </section>
 
     <section class="slide">
@@ -744,7 +703,7 @@ FROM
     </form>
 
     <p class="deck-status deck-progress-10">
-        <span class="deck-status-current"></span> / <span class="deck-status-total"></span> − <span class="var-venue">Estate GIS 2018</span> − <span class="var-title">Geoprocessing in SQL</span>
+        <span class="deck-status-current"></span> / <span class="deck-status-total"></span> − <span class="var-venue">Incontri Estivi GFOSS 2020</span> − <span class="var-title">Introduzione ai database geospaziali</span>
     </p>
 
     <!-- End extension snippets. -->
@@ -802,6 +761,7 @@ FROM
             } else {
                 url += '&tab=t'
             }
+            url += '&title=INTRODUZIONE AI DATABASE GEOSPAZIALI - Incontri estivi GFOSS'
             console.log(encodeURI(url));
             var win = window.open(encodeURI(url), '_blank');
             win.focus();
