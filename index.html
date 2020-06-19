@@ -217,8 +217,15 @@ SELECT * FROM centri     -- Centri abitati (geometrie puntuali)</textarea>
 SELECT * FROM pop        -- Popolazione italiana per comune (senza geometria)</textarea>
         <button></button>
       </div>
-
       <p>L'elenco delle tabelle e dei relativi campi disponibili può essere visualizzato in ogni momento premendo il bottone "elenco tabelle"</p>
+      <p>E' buona prassi limitare il numero di record che una query può restituire, soprattutto in fase di sviluppo e test della query complesse, in modo da velocizzare i tempi di ricerca e non impattare sulle performance del database od ottenere risultati più significativi  </p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT * FROM pop
+ORDER BY pop_totale DESC
+LIMIT 10</textarea>
+        <button></button>
+      </div>
 </section>
 
     <section class="slide">
@@ -304,16 +311,14 @@ FROM pop</textarea>
       <p>ordinamento crescente</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT *
-FROM pop
+SELECT * FROM pop
 ORDER BY famiglie</textarea>
         <button></button>
       </div>
       <p>ordinamento decrescente</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT *
-FROM pop
+SELECT * FROM pop
 ORDER BY pop_totale DESC
         </textarea>
         <button></button>
@@ -321,8 +326,7 @@ ORDER BY pop_totale DESC
       <p>ordinamento alfabetico multiplo</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT *
-FROM comuni
+SELECT * FROM comuni
 ORDER BY provincia,comune</textarea>
         <button></button>
       </div>
@@ -330,16 +334,8 @@ ORDER BY provincia,comune</textarea>
 
     <section class="slide">
       <h2>JOIN - relazioni tra tabelle</h2>
-      <p>La funzione fondamentale dei database relazionali è consentire l'aggregazione di dati tra due tabelle:
-      <a href="https://it.wikipedia.org/wiki/Join_(SQL)">stabilendo una relazione tra campi</a>. Il tipo più semplice di join è il CROSS JOIN (senza condizioni):</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-SELECT comuni.comune, pop.comune
-FROM comuni,pop
-WHERE comuni.istat = 28028</textarea>
-        <button></button>
-      </div>
-      <p>L'INNER JOIN associa le righe delle tabelle che soddisfano una condizione, tralasciando le altre</p>
+      <p>La funzione fondamentale dei database relazionali è consentire l'aggregazione di dati tra due tabelle
+      <a href="https://it.wikipedia.org/wiki/Join_(SQL)">stabilendo una relazione tra campi</a></p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT
@@ -349,18 +345,8 @@ FROM comuni JOIN pop ON comuni.istat=pop.cod
 ORDER BY densita DESC</textarea>
         <button></button>
       </div>
-      <p>il LEFT JOIN associa a tutte le righe di una tabella le righe di un'altra solo se soddisfano una condizione, altrimenti NULL</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-SELECT
-  centri.NAMN1,
-  comuni.comune
-FROM centri LEFT JOIN comuni ON centri.NAMN1=comuni.comune
-WHERE centri.NAMN1 LIKE 'Pe%'
-        </textarea>
-        <button></button>
-      </div>
-      <p>il RIGHT JOIN (meno usato) al contrario del LEFT JOIN, considera solo le righe di una tabella che soddisfano una condizione insieme a tutte le righe di un'altra tabella (non supportato da spatiasql.js)</p>
+      <p>JOIN associa a tutte le righe di una tabella le righe di un'altra solo se soddisfano una condizione, altrimenti NULL</p>
+      <img src="http://resources.esri.com/help/9.3/arcgisengine/java/gp_toolref/coverage_toolbox/InfoTableJoin.gif">
     </section>
 
     <section class="slide">
@@ -387,25 +373,6 @@ GROUP BY provincia</textarea>
         <button></button>
       </div>
       <a href="https://www.sqlite.org/lang_aggfunc.html">Funzione di aggregazione disponibili in SQlite</a>
-    </section>
-
-    <section class="slide">
-      <h2>HAVING vs WHERE</h2>
-      <p>il raggruppamento può essere basato su una condizione espressa dalla clausola HAVING. Esiste una sottile differenza tra WHERE ed HAVING. La prima direttiva agisce in fase di "fetching" dei dati dalla tabella selezionando solo quelli che soddisfano la condizione, mentre la seconda solo sul risultato del raggruppamento</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-SELECT
-	provincia,
-  COUNT(comune) as num_comuni,
-  SUM(area_ha) as area_tot,
-  AVG(area_ha) as area_media
-FROM comuni
-WHERE area_ha > 5000 -- prima viene eseguito il WHERE
-GROUP BY provincia
-HAVING area_tot > 100000 -- poi viene eseguito HAVING</textarea>
-        <button></button>
-      </div>
-
     </section>
 
     <section class="slide">
@@ -660,7 +627,7 @@ GROUP BY provincia
     </section>
 
     <section class="slide">
-      <h2>Quanto è lungo è il fiume bacchiglione?</h2>
+      <h2>Quanto è lungo un dato fiume?</h2>
       <p>Individuazione del fiume: Trattandosi di un grafo idrologico, il fiume è individuato da una serie di archi:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -687,7 +654,7 @@ GROUP BY NAMN1
     </section>
 
     <section class="slide">
-      <h2>Quanti e Quali comuni sono attraversati dal fiume Brenta?</h2>
+      <h2>Quanti e Quali comuni sono attraversati da un dato fiume?</h2>
       <p>Metodo 1: con subquery</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -714,31 +681,6 @@ GROUP BY comune
         <button></button>
       </div>
       <p>Nota bene: Questa query non funzionerebbe in postgis poichè nel caso di raggruppamento Postgresql richiede di specificare una funzione di aggregazione per ogni campo</p>
-    </section>
-
-    <section class="slide">
-      <h1>QGIS</h1>
-    </section>
-
-    <section class="slide">
-      <h2>Spatialite in QGIS</h2>
-      <p>E' possibile replicare in ambiente QGIS le esercitazioni del workshop. In tal caso è necessario:  </p>
-      <ul>
-        <li>Scaricare in locale il database dell'esercitazione: <a href="https://github.com/enricofer/spatiasql.js/blob/gh-pages/data/veneto.sqlite?raw=true">veneto.sqlite</a></li>
-        <li>Stabilire una connessione con il database </li>
-        <li>Aprire DB MANAGER</li>
-        <li>Incollare le query nella finestra SQL ed aggiungerle in mappa</li>
-      </ul>
-      <img src="img/QGIS_spatialite.png"/>
-    </section>
-
-    <section class="slide">
-      <h2>Virtual layers in QGIS</h2>
-      <p>Un'altro modo per usare in modo produttivo le query geospaziali in QGIS sono i <a href="https://docs.qgis.org/2.14/it/docs/user_manual/working_with_vector/virtual_layers.html">Virtual Layers:</a></p>
-      <p>I virtual Layers sono una caratteristica poco nota ma molto potente di QGIS, e permettono di creare relazioni SQL tra i layer correntemente caricati da qualunque datasource. Il virtual layer viene rigenerato in modo automatico e trasparente ogni qualvolta vengono aggiornati i layers collegati al layer virtuale: </p>
-      <p>La funzionalità è resa possibile replicando i layers in un database Spatialite locale gestito direttamente da QGIS, dunque la sintassi da utilizzare nelle query è quella di Spatialite. Su questa funzionalità è disponibile un breve ma chiaro <a href="https://pigrecoinfinito.wordpress.com/2016/04/06/qgis-virtual-layer/">tutorial di Totò Fiandaca</a></p>
-
-      <img src="img/QGIS_virtual_layers.png"/>
     </section>
 
     <!-- End slides. -->
