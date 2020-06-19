@@ -557,7 +557,7 @@ WHERE st_intersects(fiumi.geom,ferrovie.geom)</textarea>
     </section>
 
     <section class="slide">
-      <h2>MISURE e TRASFORMAZIONI</h2>
+      <h2>MISURE, TRASFORMAZIONI E BUFFER</h2>
       <p>E' possibile acquisire dati dimensionali delle geometrie inserite lunghezze, aree, distanze</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -580,22 +580,150 @@ SELECT NAMN1,St_distance(geom,ST_GeomFromText('POINT(11.89 45.4)')) AS dist_pd F
 SELECT NAMN1,St_length(st_transform(geom,3003)) AS lunghezza FROM fiumi</textarea>
         <button></button>
       </div>
-    </section>
-
-    <section class="slide">
-      <h2>BUFFER</h2>
       <p>La funzione di buffer genera un poligono i cui vertici distano ad una distanza costante da una geometria generatrice</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
-SELECT
-  asgeojson(st_buffer(fiumi.geom,ferrovie.geom)) as geojson,
-  fiumi.NAMN1,
-  ferrovie.NAMN1
-FROM fiumi
+SELECT  asgeojson(st_buffer(fiumi.geom,0.03)) as geojson FROM fiumi</textarea>
+        <button></button>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h1>ELABORAZIONI</h1>
+    </section>
+
+    <section class="slide">
+      <h2>Quali sono i centri serviti dalla ferrovia?</h2>
+      <p>Individuazione di un buffer di 10 km dalla ferrovia</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT AsGeoJson(st_buffer(st_union(geom), 0.03)) AS geojson
+FROM ferrovie
         </textarea>
         <button></button>
       </div>
-      <p>GeoArt</p>
+      <p>individuazione dei centri ricadenti nel buffer appena individuato</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT *,ASgeoJSON(geom) as geojson
+FROM centri
+WHERE st_intersects(geom, (
+    SELECT st_buffer(st_union(geom), 0.03)
+    FROM ferrovie
+))
+        </textarea>
+        <button></button>
+      </div>
+      <p>metodo alternativo meno performante ma che recupera i dati </p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT centri.NAMN1,st_distance(centri.geom,ferrovie.geom),ASgeoJSON(centri.geom) as geojson
+FROM centri JOIN ferrovie 
+	ON st_intersects(centri.geom, st_buffer(ferrovie.geom, 0.03))
+GROUP BY centri.NAMN1
+        </textarea>
+        <button></button>
+        <p>NB: i dati geografici sono espressi in latitudine e longitudine quindi la distanza di buffer va espressa in gradi (0.01 gradi corrispondono circa a 950 m)</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Qual'è la popolazione dell'area metropolitana di Verona?</h2>
+      <p>Individuazione dei comuni limitrofi</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT comune, asgeojson(geom) as geojson
+FROM comuni 
+WHERE st_touches(geom, (
+  SELECT geom
+  FROM comuni
+  WHERE comune = 'Verona'
+))
+        </textarea>
+        <button></button>
+        <p>Usando st_intersects al posto di st_touches si include anche il comune stesso di Verona</p>
+      </div>
+      <p>Si può quindi raggruppare la tabella sommando la lunghezza di ogni arco</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT SUM(pop.pop_totale), asgeojson(st_union(geom)) as geojson
+FROM comuni JOIN pop on comuni.istat=pop.cod
+WHERE st_Touches(geom, (
+  SELECT geom
+  FROM comuni
+  WHERE comune = 'Verona'
+))
+GROUP BY provincia
+        </textarea>
+        <button></button>
+      </div>
+      <p>Nota bene: Questa query non funzionerebbe in postgis poichè nel caso di raggruppamento Postgresql richiede di specificare una funzione di aggregazione per ogni campo</p>
+    </section>
+
+    <section class="slide">
+      <h2>Quanto è lungo è il fiume bacchiglione?</h2>
+      <p>Individuazione del fiume: Trattandosi di un grafo idrologico, il fiume è individuato da una serie di archi:</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT  NAMN1,asgeojson(geom) as geojson 
+FROM fiumi 
+WHERE NAMN1 = 'Fiume Bacchiglione'
+        </textarea>
+        <button></button>
+      </div>
+      <p>Metodo 1: quindi si può raggruppare sommando la lunghezza di ugni arco</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT  
+	NAMN1, 		
+    st_length(st_transform(st_union(geom),3003)),
+    asgeojson(st_union(geom)) as geojson 
+FROM fiumi 
+WHERE NAMN1 = 'Fiume Bacchiglione'
+GROUP BY NAMN1
+        </textarea>
+        <button></button>
+      </div>
+      <p>Nota bene: Questa query non funzionerebbe in postgis poichè nel caso di raggruppamento Postgresql richiede di specificare una funzione di aggregazione per ogni campo</p>
+    </section>
+
+    <section class="slide">
+      <h2>Quanti e Quali comuni sono attraversati dal fiume Brenta?</h2>
+      <p>Metodo 1: con subquery</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT  *,asgeojson(geom) as geojson 
+FROM comuni 
+WHERE st_intersects(geom, (
+  SELECT st_union(geom)
+  FROM fiumi 
+  WHERE NAMN1 = 'Fiume Brenta'
+  GROUP BY NAMN1
+))
+        </textarea>
+        <button></button>
+      </div>
+      <p>Metodo 2: con join</p>
+      <div class ='wrapper editor'>
+        <textarea class="code" id='code' name='code'>
+SELECT  comuni.comune,asgeojson(comuni.geom) as geojson 
+FROM comuni
+JOIN fiumi ON st_intersects(comuni.geom, fiumi.geom)
+WHERE fiumi.NAMN1 = 'Fiume Brenta'
+GROUP BY comune
+        </textarea>
+        <button></button>
+      </div>
+      <p>Nota bene: Questa query non funzionerebbe in postgis poichè nel caso di raggruppamento Postgresql richiede di specificare una funzione di aggregazione per ogni campo</p>
+    </section>
+      
+
+    <section class="slide">
+      <h1>ELABORAZIONI</h1>
+    </section>
+    
+    <section class="slide">
+      <h2>GeoArt</h2>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT asgeojson(st_difference(centri_ferrovie.geom,fiumi_b.geom)) AS geojson
