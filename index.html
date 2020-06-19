@@ -447,13 +447,12 @@ ORDER BY num_comuni;</textarea>
 
     <section class="slide">
       <h2>Il campo geometria</h2>
-      <p>I tipi geometrici possono essere i seguenti:</p>
+      <p>I <a href="https://www.gaia-gis.it/gaia-sins/spatialite-cookbook/html/wkt-wkb.html">tipi geometrici</a> possono essere i seguenti:</p>
       <ul>
-        <li>geometria puntuale</li>
-        <li>geometria lineare</li>
-        <li>geometria poligonale</li>
+        <li>geometria puntuale (POINT e MULTIPOINT)</li>
+        <li>geometria lineare (LINESTRING e MULTILINESTRING)</li>
+        <li>geometria poligonale (POLYGON e MULTIPOLYGON)</li>
       </ul>
-      <p>che possono essere semplici o multiple e raccoglibili in collezioni: <a href="https://www.gaia-gis.it/gaia-sins/spatialite-cookbook/html/wkt-wkb.html">RIF</a></p>
       <p>L'informazione spaziale è contenuta in almeno un campo geometrico. Nelle tabelle del workshop il campo geografico è per convenzione il campo "geom", ma nulla vieta che possa avere un altro nome.<br/>Il formato di memorizzazione è binario, e quindi non visualizzabile "per gli umani" ma disponiamo di funzioni che permettono di trasformarlo in un formato più amichevole:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -715,76 +714,6 @@ GROUP BY comune
         <button></button>
       </div>
       <p>Nota bene: Questa query non funzionerebbe in postgis poichè nel caso di raggruppamento Postgresql richiede di specificare una funzione di aggregazione per ogni campo</p>
-    </section>
-      
-
-    <section class="slide">
-      <h1>ELABORAZIONI</h1>
-    </section>
-    
-    <section class="slide">
-      <h2>GeoArt</h2>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-SELECT asgeojson(st_difference(centri_ferrovie.geom,fiumi_b.geom)) AS geojson
-FROM
-  (SELECT st_union(centri_b.geom,ferrovie_b.geom) AS geom
-  FROM
-    (SELECT st_union(st_buffer(geom,0.01)) AS geom
-    FROM centri) AS centri_b,
-    (SELECT st_union(st_buffer(geom,0.02)) AS geom
-    FROM ferrovie) AS ferrovie_b) AS centri_ferrovie,
-  (SELECT st_union(st_buffer(geom,0.02)) AS geom
-    FROM fiumi) AS fiumi_b</textarea>
-        <button></button>
-      </div>
-    </section>
-
-    <section class="slide">
-      <h2>ALTRE ELABORAZIONI</h2>
-      <p>Query per il calcolo della distanza più breve tra centri e fiumi. </p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-          SELECT AsGeoJson(geom) AS geojson
-          FROM
-              (SELECT
-                  ST_distance(centri.geom,fiumi.geom) AS dist,
-                  St_ShortestLine(centri.geom,fiumi.geom) AS geom,
-                  centri.NAMN1,
-                  fiumi.NAMN1
-              FROM centri,
-                (SELECT ST_union(geom) AS geom, NAMN1
-                FROM fiumi
-                GROUP BY NAMN1) as fiumi
-              GROUP BY centri.NAMN1
-              HAVING MIN(dist)) AS centri_fiumi
-          UNION
-          SELECT AsGeoJson(geom) AS geojson
-          FROM centri
-          UNION
-          SELECT AsGeoJson(geom) AS geojson
-          FROM fiumi</textarea>
-        <button></button>
-      </div>
-    </section>
-
-    <section class="slide">
-      <h2>ALTRE ELABORAZIONI</h2>
-      <p>analisi dell'eccentricità territoriale</p>
-      <div class ='wrapper editor'>
-        <textarea class="code" id='code' name='code'>
-          SELECT AsGeoJson(st_collect(st_collect(st_collect(geom_a,geom_l),geom_p),geom_o)) AS geojson
-          FROM
-          	(SELECT geom_a,geom_l,geom_p, geom_o, area_com, area_com/st_area(geom_a) as eccentricita
-               FROM
-                (SELECT 	ST_buffer(st_centroid(geom),ST_length(st_shortestline(geom,st_centroid(geom)))) AS geom_a,
-                 	  st_shortestline(geom,st_centroid(geom)) as geom_l,
-                 	  ST_ExteriorRing(ST_ConvexHull(geom)) as geom_p,
-                 	  st_difference(ST_ConvexHull(geom),geom) as geom_o,
-                    st_area(geom) as area_com
-                FROM comuni) as comuni_dist) as comuni_ecc</textarea>
-        <button></button>
-      </div>
     </section>
 
     <section class="slide">
