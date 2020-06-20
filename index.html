@@ -85,7 +85,7 @@
       <h2>INTRODUZIONE AI DATABASE GEOSPAZIALI</h2>
       <h2>https://enricofer.github.io/spatial_sql_workshop/</h2>
       <h3>INCONTRI ESTIVI GFOSS</h3>
-      <p><a href="https://creativecommons.org/licenses/by-sa/3.0/it/">(C)2020 CC-BY-SA</a> Enrico Ferreguti  Luca Lanteri  Rocco Pispico</p>
+      <p><a href="https://creativecommons.org/licenses/by-sa/3.0/it/" target="_blank">(C)2020 CC-BY-SA</a> Enrico Ferreguti  Luca Lanteri  Rocco Pispico</p>
     </section>
 
     <section class="slide">
@@ -127,12 +127,13 @@ UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
 
     <section class="slide">
       <h2>SQL SELECT</h2>
-      <p>ma quello che ci interessa oggi è la query di ricerca</p>
+      <p>ma quello che ci interessa oggi è la <a href="https://www.sqlite.org/lang_select.html" target="_blank">query di ricerca</a></p>
       <div class ='wrapper editor'>
       <textarea class="code" id='code4' name='code'>
-        SELECT id, campo1   -- prendi id e campo1
+        SELECT id, campo1   -- prendi i campi id e campo1
         FROM tabella        -- da tabella
-        WHERE campo2 > 100; -- dalle righe che soddisfano una condizione</textarea>
+        WHERE campo2 > 100; -- dalle righe che soddisfano una condizione
+        </textarea>
       <button class="hidden"></button>
       </div>
 
@@ -146,7 +147,7 @@ UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
         Ma la struttura della sintassi principale per l'estrazione dei dati
          rimane praticamente la stessa per tutti i RDBMS.<br/>
        Oggi lavoreremo con SQlite, nella sua versione con estensioni spaziali
-       <a href="http://www.gaia-gis.it/gaia-sins/">Spatialite</a>
+       <a href="http://www.gaia-gis.it/gaia-sins/" target="_blank">Spatialite</a>
        il cui sviluppo è open source ed è curato da
        <a href="mailto:a.furieri@lqt.it">Alessandro Furieri</a></p>
     </section>
@@ -154,7 +155,7 @@ UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
     <section class="slide">
       <h2>L'ambiente di lavoro del Workshop</h2>
       <p>Per facilitare e velocizzare il workshop le esercitazioni sono completamente basate su un una versione speciale di Spatialite compilata per l'utilizzo da browser. Il database è residente nella memoria del browser,
-        ma è facilmente scaricabile per l'utilizzo con QGIS per chi lo desidera:<a href="https://github.com/enricofer/spatiasql.js/blob/gh-pages/data/veneto.sqlite?raw=true">veneto.sqlite</a></p>
+        ma è facilmente scaricabile per l'utilizzo con QGIS per chi lo desidera:<a href="https://github.com/enricofer/spatiasql.js/blob/gh-pages/data/veneto.sqlite?raw=true" target="_blank">veneto.sqlite</a></p>
       <p>E' possibile una visualizzazione tabellare:</p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -162,14 +163,14 @@ UPDATE tab SET campo1 = 'valore2' WHERE id = 1;
         <button></button>
       </div>
       <p>o una visualizzazione su mappa: Le tabelle contengono un campo *geom* con le informazioni spaziali memorizzate in latitudine e longitudine (ETRS89 epsg:4258) e visualizzabili
-        producendo una geometria <a href="https://it.wikipedia.org/wiki/GeoJSON">geojson</a> per mezzo della funzione AsGeoJSON()<br/></p>
+        producendo una geometria <a href="https://it.wikipedia.org/wiki/GeoJSON" target="_blank">geojson</a> per mezzo della funzione AsGeoJSON()<br/></p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
       SELECT *, AsGeoJSON(geom) AS geojson
       FROM comuni</textarea>
         <button></button>
       </div>
-      <p>Il formato <a href="https://it.wikipedia.org/wiki/GeoJSON">geojson</a> è un formato testuale facilmente interpretabile da javascript come un'oggetto (dati serializzati) contentente dati geografici e relativi attributi.
+      <p>Il formato <a href="https://it.wikipedia.org/wiki/GeoJSON" target="_blank">geojson</a> è un formato testuale facilmente interpretabile da javascript come un'oggetto (dati serializzati) contentente dati geografici e relativi attributi.
       Il formato è uno standard codificato di internet e costituisce una specie di lingua universale per l'interscambio di dati geografici nel web</p>
     </section>
 
@@ -288,7 +289,7 @@ WHERE comune LIKE 'Ve%'</textarea>
       </div>
 
         <p>le condizioni in WHERE possono essere assemblate con AND, OR e negate con NOT
-        <a href="https://www.techonthenet.com/sqlite/and_or.php">attenzione alla precedenza degli operatori</a></p>
+        <a href="https://www.techonthenet.com/sqlite/and_or.php" target="_blank">attenzione alla precedenza degli operatori</a></p>
 
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
@@ -335,7 +336,7 @@ ORDER BY provincia,comune</textarea>
     <section class="slide">
       <h2>JOIN - relazioni tra tabelle</h2>
       <p>La funzione fondamentale dei database relazionali è consentire l'aggregazione di dati tra due tabelle
-      <a href="https://it.wikipedia.org/wiki/Join_(SQL)">stabilendo una relazione tra campi</a></p>
+      <a href="https://it.wikipedia.org/wiki/Join_(SQL)" target="_blank">stabilendo una relazione tra campi</a></p>
       <div class ='wrapper editor'>
         <textarea class="code" id='code' name='code'>
 SELECT
@@ -372,7 +373,7 @@ FROM comuni JOIN pop ON comuni.istat = pop.cod
 GROUP BY provincia</textarea>
         <button></button>
       </div>
-      <a href="https://www.sqlite.org/lang_aggfunc.html">Funzione di aggregazione disponibili in SQlite</a>
+      <a href="https://www.sqlite.org/lang_aggfunc.html" target="_blank">Funzione di aggregazione disponibili in SQlite</a>
     </section>
 
     <section class="slide">
@@ -401,7 +402,7 @@ ORDER BY num_comuni;</textarea>
 
     <section class="slide">
       <h2>Funzioni geometriche di Spatialite</h2>
-      <p>L'estensione spaziale di SQlite è Spatialite, e dispone di una serie molto completa di funzioni per la minipolazione di informazioni geografiche: <a href="http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.0.html">Reference List</a></p>
+      <p>L'estensione spaziale di SQlite è Spatialite, e dispone di una serie molto completa di funzioni per la manipolazione di informazioni geografiche: <a href="http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.0.html" target="_blank">Reference List</a> ed è compatibile con lo standard <a href="https://www.ogc.org/" target="_blank">OGC</a> per le funzioni geospaziali nei database</p>
       <p>Le funzioni basilari che utilizzeremo nel workshop sono le seguenti</p>
       <ul>
         <li>condizioni topologiche (condizioni spaziali): dentro, fuori, contenuto da, coincidente etc...</li>
@@ -414,7 +415,7 @@ ORDER BY num_comuni;</textarea>
 
     <section class="slide">
       <h2>Il campo geometria</h2>
-      <p>I <a href="https://www.gaia-gis.it/gaia-sins/spatialite-cookbook/html/wkt-wkb.html">tipi geometrici</a> possono essere i seguenti:</p>
+      <p>I <a href="https://www.gaia-gis.it/gaia-sins/spatialite-cookbook/html/wkt-wkb.html" target="_blank">tipi geometrici</a> possono essere i seguenti:</p>
       <ul>
         <li>geometria puntuale (POINT e MULTIPOINT)</li>
         <li>geometria lineare (LINESTRING e MULTILINESTRING)</li>
@@ -439,7 +440,7 @@ FROM centri</textarea>
 
     <section class="slide">
       <h2>Visualizzazione in mappa</h2>
-      <p>Il risultato della query può essere visualizzato in mappa quando la tabella di output contiene un campo "geojson" contente le geometrie da visualizzare in formato <a href="http://geojson.org/">geojson:</a></p>
+      <p>Il risultato della query può essere visualizzato in mappa quando la tabella di output contiene un campo "geojson" contente le geometrie da visualizzare in formato <a href="http://geojson.org/" target="_blank">geojson:</a></p>
       <p>Il formato geojson è l'espressione testuale di un'oggetto javascript prodotta secondo lo standard "json" ed è facilmente "digeribile" dalle applicazioni web</p>
       <p>L'altra condizione perchè la geometria possa essere visualizzata correttamente nel visualizzatore è che il dato geografico deve essere espresso in gradi di latitudine e longitudine. Le tabelle predefinite sono nel formato ETRS89-epsg4258, sono quindi compatibili con il visualizzatore </p>
       <div class ='wrapper editor'>
